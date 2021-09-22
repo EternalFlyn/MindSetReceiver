@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - EEG raw data viewer
 
+## [0.2.0] - 2021-09-22
+### Added
+- Using fazecast's jSerialComm library communicate with mind wave mobile device
+### Changed
+- Update kotlin version
+- Change kt file locate from java folder to kotlin folder
+### Removed
+- ThinkGear because thinkgear DLL is 32bits version
+
 ## [0.1.0] - 2021-09-15
 ### Added
-- ThinkGear class using JNA from thinkgear.dll
+- ThinkGear using JNA from thinkgear.dll
