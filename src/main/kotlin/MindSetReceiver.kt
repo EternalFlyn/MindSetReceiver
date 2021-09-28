@@ -1,33 +1,47 @@
-import com.fazecast.jSerialComm.SerialPort
-import com.fazecast.jSerialComm.SerialPortDataListener
-import com.fazecast.jSerialComm.SerialPortEvent
+import data.DataReceiver
+import event.*
+import listener.*
+import kotlin.experimental.xor
 
 internal const val RECEIVE_DATA_TIME = 5000L
 
 fun main() {
+    DataReceiver.addListener(object : PoorSignalListener, AttentionListener, MeditationListener, StrengthListener, RawWaveListener, EEGPowerListener {
 
-    val serialPort = SerialPort.getCommPort("COM4")
-
-    serialPort.openPort()
-
-    serialPort.addDataListener(object: SerialPortDataListener {
-
-        override fun getListeningEvents(): Int {
-            return SerialPort.LISTENING_EVENT_DATA_AVAILABLE
+        override fun onRawWaveEvent(event: RawWaveEvent) {
+            println("Receive Raw Wave Event, value: ${event.value}")
         }
 
-        override fun serialEvent(event: SerialPortEvent?) {
-            if(event?.eventType != SerialPort.LISTENING_EVENT_DATA_AVAILABLE) return
-            val bytes = ByteArray(serialPort.bytesAvailable())
-            serialPort.readBytes(bytes, bytes.size.toLong())
-            println("Length: ${bytes.size}")
-            bytes.forEach { print("%02x ".format(it)) }
-            println()
+        override fun onPoorSignalEvent(event: PoorSignalEvent) {
+            println("Receive Poor Signal Event, value: ${event.quality}")
+        }
+
+        override fun onAttentionEvent(event: AttentionEvent) {
+            println("Receive Attention Event, value: ${event.value}")
+        }
+
+        override fun onEEGPowerEvent(event: EEGPowerEvent) {
+            print("Receive EEG Event,")
+            print("low-alpha: ${event.lowAlpha},")
+            print("high-alpha: ${event.highAlpha},")
+            print("low-beta: ${event.lowBeta},")
+            print("high-beta: ${event.highBeta},")
+            print("low-gamma: ${event.lowGamma},")
+            print("mid-gamma: ${event.midGamma},")
+            print("delta: ${event.delta},")
+            println("theta: ${event.theta}")
+        }
+
+        override fun onMeditationEvent(event: MeditationEvent) {
+            println("Receive Meditation Event, value: ${event.value}")
+        }
+
+        override fun onStrengthEvent(event: StrengthEvent) {
+            println("Receive Strength Event, value: ${event.value}")
         }
 
     })
-
+    DataReceiver.connect()
     Thread.sleep(RECEIVE_DATA_TIME)
-    serialPort.closePort()
-
+    DataReceiver.disconnect()
 }

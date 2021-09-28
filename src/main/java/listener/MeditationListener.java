@@ -2,7 +2,7 @@ package listener;
 
 import event.MeditationEvent;
 
-public interface MeditationListener {
+public interface MeditationListener extends DeviceListener {
 
     void onMeditationEvent(MeditationEvent event);
 
