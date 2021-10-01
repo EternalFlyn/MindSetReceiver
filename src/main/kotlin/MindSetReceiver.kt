@@ -1,7 +1,6 @@
 import data.DataReceiver
 import event.*
 import listener.*
-import kotlin.experimental.xor
 
 internal const val RECEIVE_DATA_TIME = 5000L
 
@@ -41,7 +40,7 @@ fun main() {
         }
 
     })
-    DataReceiver.connect()
+    DataReceiver.connect(true)
     Thread.sleep(RECEIVE_DATA_TIME)
     DataReceiver.disconnect()
 }

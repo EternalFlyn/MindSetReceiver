@@ -3,29 +3,34 @@ package data;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class Decoder {
+class Decoder {
 
     record MetaEvent(int code, List<Byte> value) {}
+
+    static boolean isDecoding = false;
+    static ConcurrentLinkedQueue<Byte> dataStorage;
 
     private enum  DecoderState { GET_CODE, GET_LENGTH, GET_VALUE }
 
     @NotNull
-    static ArrayList<MetaEvent> dataDecode(LinkedList<Byte> data) {
+    static ArrayList<MetaEvent> dataDecode() {
+        isDecoding = true;
         ArrayList<MetaEvent> result = new ArrayList<>();
-        if ((data.removeFirst() & 0xFF) != 0xAA) return result;
-        if ((data.removeFirst() & 0xFF) != 0xAA) return result;
-        int payloadLength = data.removeFirst() & 0xFF;
+        if(dataStorage == null) return result;
+        if ((getData() & 0xFF) != 0xAA) return result;
+        if ((getData() & 0xFF) != 0xAA) return result;
+        int payloadLength = getData() & 0xFF;
         ArrayList<Byte> payload = new ArrayList<>();
         byte checkSum = 0;
         for(int i = 0; i < payloadLength; i++) {
-            byte b = data.removeFirst();
+            byte b = getData();
             checkSum += b & 0xFF;
             payload.add(b);
         }
-        if ((~checkSum & 0xFF) != (data.removeFirst() & 0xFF)) return result;
+        if ((~checkSum & 0xFF) != (getData() & 0xFF)) return result;
         DecoderState state = DecoderState.GET_CODE;
         int dataLength = 1, code = 0;
         ArrayList<Byte> value = new ArrayList<>();
@@ -51,7 +56,19 @@ public class Decoder {
                 }
             }
         }
+        isDecoding = false;
         return result;
+    }
+
+    private static byte getData() {
+        while(dataStorage.size() <= 0) {
+            try {
+                Thread.sleep(0, 100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return dataStorage.poll();
     }
 
     private Decoder() {}

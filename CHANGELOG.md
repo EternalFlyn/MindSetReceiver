@@ -8,10 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - EEG raw data viewer
 
+## [0.2.2] - 2021-10-01
+### Fixed
+- dataDecode throw the null pointer exception
+
 ## [0.2.1] - 2021-09-27
 ### Added
 - DataReceiver, receive device data and decode it
 - possible event and listener
+### Fixed
+- DataReceiver name mistake
 
 ## [0.2.0] - 2021-09-22
 ### Added
