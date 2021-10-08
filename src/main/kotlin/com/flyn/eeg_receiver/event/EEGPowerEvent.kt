@@ -1,4 +1,4 @@
-package event
+package com.flyn.eeg_receiver.event
 
 class EEGPowerEvent(val delta: Int,
                     val theta: Int,

@@ -1,6 +1,6 @@
-package listener;
+package com.flyn.eeg_receiver.listener;
 
-import event.EEGPowerEvent;
+import com.flyn.eeg_receiver.event.EEGPowerEvent;
 
 public interface EEGPowerListener extends DeviceListener {
 

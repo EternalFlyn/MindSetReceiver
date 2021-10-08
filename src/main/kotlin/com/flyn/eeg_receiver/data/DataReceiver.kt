@@ -1,12 +1,13 @@
-package data
+package com.flyn.eeg_receiver.data
 
 import com.fazecast.jSerialComm.SerialPort
 import com.fazecast.jSerialComm.SerialPortDataListener
 import com.fazecast.jSerialComm.SerialPortEvent
-import event.*
-import listener.*
+import com.flyn.eeg_receiver.event.*
+import com.flyn.eeg_receiver.listener.*
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -40,7 +41,7 @@ object DataReceiver {
                 val bytes = ByteArray(serialPort.bytesAvailable())
                 serialPort.readBytes(bytes, bytes.size.toLong())
                 if(echo) {
-                    println("${System.currentTimeMillis()} - Length: ${bytes.size}")
+                    println("${Date(System.currentTimeMillis())} - Length: ${bytes.size}")
                     bytes.forEach { print("%02x ".format(it)) }
                     println()
                 }

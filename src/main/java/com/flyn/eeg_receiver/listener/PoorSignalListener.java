@@ -1,6 +1,6 @@
-package listener;
+package com.flyn.eeg_receiver.listener;
 
-import event.PoorSignalEvent;
+import com.flyn.eeg_receiver.event.PoorSignalEvent;
 
 public interface PoorSignalListener extends DeviceListener {
 

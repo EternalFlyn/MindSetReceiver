@@ -1,6 +1,6 @@
-package listener;
+package com.flyn.eeg_receiver.listener;
 
-import event.AttentionEvent;
+import com.flyn.eeg_receiver.event.AttentionEvent;
 
 public interface AttentionListener extends DeviceListener {
 

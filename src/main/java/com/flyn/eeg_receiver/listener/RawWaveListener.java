@@ -1,6 +1,6 @@
-package listener;
+package com.flyn.eeg_receiver.listener;
 
-import event.RawWaveEvent;
+import com.flyn.eeg_receiver.event.RawWaveEvent;
 
 public interface RawWaveListener extends DeviceListener {
 

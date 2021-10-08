@@ -1,6 +1,6 @@
-package listener;
+package com.flyn.eeg_receiver.listener;
 
-import event.StrengthEvent;
+import com.flyn.eeg_receiver.event.StrengthEvent;
 
 public interface StrengthListener extends DeviceListener {
 

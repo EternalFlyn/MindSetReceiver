@@ -1,4 +1,0 @@
-package event
-
-interface DeviceEvent {
-}

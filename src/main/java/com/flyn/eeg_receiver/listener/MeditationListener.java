@@ -1,6 +1,6 @@
-package listener;
+package com.flyn.eeg_receiver.listener;
 
-import event.MeditationEvent;
+import com.flyn.eeg_receiver.event.MeditationEvent;
 
 public interface MeditationListener extends DeviceListener {
 

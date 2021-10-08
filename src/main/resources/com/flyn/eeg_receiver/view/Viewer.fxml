@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.layout.*?>
+
+<Pane xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.flyn.eeg_receiver.view.Viewer">
+    <LineChart fx:id="rawDataChart" layoutY="4.0" legendVisible="false" title="Raw Data">
+      <xAxis>
+          <NumberAxis side="BOTTOM" />
+      </xAxis>
+      <yAxis>
+          <NumberAxis side="LEFT" />
+      </yAxis>
+    </LineChart>
+</Pane>

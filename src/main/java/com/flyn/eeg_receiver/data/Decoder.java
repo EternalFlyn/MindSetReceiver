@@ -1,4 +1,4 @@
-package data;
+package com.flyn.eeg_receiver.data;
 
 import org.jetbrains.annotations.NotNull;
 
