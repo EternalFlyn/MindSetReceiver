@@ -1,4 +1,4 @@
 package com.flyn.eeg_receiver.event
 
-class PoorSignalEvent(val quality: Int): DeviceEvent {
+class PoorSignalEvent(val time: Long, val quality: Int): DeviceEvent {
 }

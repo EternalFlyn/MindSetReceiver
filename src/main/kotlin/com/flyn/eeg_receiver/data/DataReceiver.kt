@@ -24,7 +24,7 @@ object DataReceiver {
     private val dataStorage = ConcurrentLinkedQueue<Byte>()
     private val eventList = ConcurrentLinkedQueue<DeviceEvent>()
     private val listenerList = CopyOnWriteArrayList<DeviceListener>()
-    private val serialPort = SerialPort.getCommPort("COM9")
+    private val serialPort = SerialPort.getCommPort("COM6")
 
     fun connect(echo: Boolean = false) {
         if (isConnect) return
@@ -69,8 +69,9 @@ object DataReceiver {
     private fun dataDecoder() {
         while (isConnect) {
             if (dataStorage.size > 0) {
+                val time = System.currentTimeMillis()
                 Decoder.dataDecode().forEach {
-                    payloadDecoder(it.code, it.value)
+                    payloadDecoder(time, it.code, it.value)
                 }
             }
             else {
@@ -79,15 +80,15 @@ object DataReceiver {
         }
     }
 
-    private fun payloadDecoder(code: Int, values: List<Byte>) {
+    private fun payloadDecoder(time: Long, code: Int, values: List<Byte>) {
         when (code) {
-            POOR_SIGNAL -> eventList.add(PoorSignalEvent(values[0].toUByte().toInt()))
-            ATTENTION -> eventList.add(AttentionEvent(values[0].toInt()))
-            MEDITATION -> eventList.add(MeditationEvent(values[0].toInt()))
-            STRENGTH -> eventList.add(StrengthEvent(values[0].toUByte().toInt()))
+            POOR_SIGNAL -> eventList.add(PoorSignalEvent(time, values[0].toUByte().toInt()))
+            ATTENTION -> eventList.add(AttentionEvent(time, values[0].toInt()))
+            MEDITATION -> eventList.add(MeditationEvent(time, values[0].toInt()))
+            STRENGTH -> eventList.add(StrengthEvent(time, values[0].toUByte().toInt()))
             RAW_WAVE -> {
                 val value = ByteBuffer.wrap(values.slice(0..1).toByteArray()).order(ByteOrder.BIG_ENDIAN)
-                eventList.add(RawWaveEvent(value.short.toInt()))
+                eventList.add(RawWaveEvent(time, value.short.toInt()))
             }
             EEG_POWER -> {
                 val wave = values.withIndex().groupBy {
@@ -99,7 +100,7 @@ object DataReceiver {
                     }
                     value
                 }
-                eventList.add(EEGPowerEvent(wave[0], wave[1], wave[2], wave[3], wave[4], wave[5], wave[6], wave[7]))
+                eventList.add(EEGPowerEvent(time, wave[0], wave[1], wave[2], wave[3], wave[4], wave[5], wave[6], wave[7]))
             }
             else -> {
                 print("unknown code event: %02x with value:".format(code))

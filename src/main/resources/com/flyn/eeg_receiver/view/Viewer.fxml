@@ -4,12 +4,12 @@
 <?import javafx.scene.layout.*?>
 
 <Pane xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.flyn.eeg_receiver.view.Viewer">
-    <LineChart fx:id="rawDataChart" layoutY="4.0" legendVisible="false" title="Raw Data">
+    <LineChart fx:id="rawDataChart" animated="false" createSymbols="false" layoutY="4.0" legendVisible="false" title="Raw Data">
       <xAxis>
-          <NumberAxis side="BOTTOM" />
+          <NumberAxis autoRanging="false" forceZeroInRange="false" label="time" minorTickVisible="false" side="BOTTOM" tickUnit="1000.0" fx:id="xAxis" />
       </xAxis>
       <yAxis>
-          <NumberAxis side="LEFT" />
+          <NumberAxis autoRanging="false" label="voltage" lowerBound="-2048.0" minorTickCount="0" minorTickLength="1.0" side="LEFT" tickUnit="256.0" upperBound="2047.0" />
       </yAxis>
     </LineChart>
 </Pane>

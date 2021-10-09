@@ -1,4 +1,4 @@
 package com.flyn.eeg_receiver.event
 
-class AttentionEvent(val value: Int): DeviceEvent {
+class AttentionEvent(val time: Long, val value: Int): DeviceEvent {
 }

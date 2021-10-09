@@ -1,7 +1,9 @@
 package com.flyn.eeg_receiver
 
+import com.flyn.eeg_receiver.data.DataReceiver
 import com.flyn.eeg_receiver.view.Viewer
 import javafx.application.Application
+import javafx.application.Platform
 import javafx.fxml.FXMLLoader
 import javafx.stage.Stage
 
@@ -13,18 +15,19 @@ class EEGReceiver: Application() {
             title = "test"
             show()
         }
+        Platform.runLater {
+            DataReceiver.connect()
+        }
+    }
 
+    override fun stop() {
+        super.stop()
+        DataReceiver.disconnect()
     }
 
 }
 
-internal const val RECEIVE_DATA_TIME = 5000L
-
 fun main() {
-//            DataReceiver.addListener(ExampleListener)
-//            DataReceiver.connect(true)
-//            Thread.sleep(RECEIVE_DATA_TIME)
-//            DataReceiver.disconnect()
     Application.launch(EEGReceiver::class.java)
 }
 

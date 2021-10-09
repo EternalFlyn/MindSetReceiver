@@ -19,7 +19,7 @@ class Decoder {
     static ArrayList<MetaEvent> dataDecode() {
         isDecoding = true;
         ArrayList<MetaEvent> result = new ArrayList<>();
-        if(dataStorage == null) return result;
+        if (dataStorage == null) return result;
         if ((getData() & 0xFF) != 0xAA) return result;
         if ((getData() & 0xFF) != 0xAA) return result;
         int payloadLength = getData() & 0xFF;
