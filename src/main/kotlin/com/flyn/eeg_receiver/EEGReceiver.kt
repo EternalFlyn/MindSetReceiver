@@ -1,5 +1,6 @@
 package com.flyn.eeg_receiver
 
+import com.fazecast.jSerialComm.SerialPort
 import com.flyn.eeg_receiver.data.DataReceiver
 import com.flyn.eeg_receiver.view.Viewer
 import javafx.application.Application
@@ -15,14 +16,11 @@ class EEGReceiver: Application() {
             title = "test"
             show()
         }
-        Platform.runLater {
-            DataReceiver.connect()
-        }
     }
 
     override fun stop() {
         super.stop()
-        DataReceiver.disconnect()
+        if (DataReceiver.isConnect) DataReceiver.disconnect()
     }
 
 }

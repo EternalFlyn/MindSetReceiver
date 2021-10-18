@@ -20,15 +20,21 @@ object DataReceiver {
     private const val RAW_WAVE = 0X80
     private const val EEG_POWER = 0X83
 
-    private var isConnect = false
     private val dataStorage = ConcurrentLinkedQueue<Byte>()
     private val eventList = ConcurrentLinkedQueue<DeviceEvent>()
     private val listenerList = CopyOnWriteArrayList<DeviceListener>()
-    private val serialPort = SerialPort.getCommPort("COM6")
+    private lateinit var serialPort: SerialPort
 
-    fun connect(echo: Boolean = false) {
+    var isConnect = false
+        private set
+    var startTime: Long = -1
+        private set
+
+    fun connect(comPort: String, echo: Boolean = false) {
         if (isConnect) return
+        isConnect = true
         Decoder.dataStorage = dataStorage
+        serialPort = SerialPort.getCommPort(comPort)
         serialPort.openPort()
         serialPort.addDataListener(object : SerialPortDataListener {
 
@@ -49,13 +55,14 @@ object DataReceiver {
             }
 
         })
-        isConnect = true
         println("Device connect")
+        startTime = System.currentTimeMillis()
         Thread { dataDecoder() }.start()
         Thread { eventExecutor() }.start()
     }
 
     fun disconnect() {
+        if (!isConnect) return
         isConnect = false
         while(Decoder.isDecoding) Thread.sleep(10)
         serialPort.closePort()
