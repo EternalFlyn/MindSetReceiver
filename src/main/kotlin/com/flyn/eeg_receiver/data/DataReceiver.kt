@@ -18,7 +18,7 @@ object DataReceiver {
     private const val MEDITATION = 0X05
     private const val STRENGTH = 0X16
     private const val RAW_WAVE = 0X80
-    private const val EEG_POWER = 0X83
+    private const val SPECTRAL = 0X83
 
     private val dataStorage = ConcurrentLinkedQueue<Byte>()
     private val eventList = ConcurrentLinkedQueue<DeviceEvent>()
@@ -97,7 +97,7 @@ object DataReceiver {
                 val value = ByteBuffer.wrap(values.slice(0..1).toByteArray()).order(ByteOrder.BIG_ENDIAN)
                 eventList.add(RawWaveEvent(time, value.short.toInt()))
             }
-            EEG_POWER -> {
+            SPECTRAL -> {
                 val wave = values.withIndex().groupBy {
                     it.index / 3
                 }.map {
@@ -107,7 +107,7 @@ object DataReceiver {
                     }
                     value
                 }
-                eventList.add(EEGPowerEvent(time, wave[0], wave[1], wave[2], wave[3], wave[4], wave[5], wave[6], wave[7]))
+                eventList.add(SpectralEvent(time, wave[0], wave[1], wave[2], wave[3], wave[4], wave[5], wave[6], wave[7]))
             }
             else -> {
                 print("unknown code event: %02x with value:".format(code))
@@ -136,8 +136,8 @@ object DataReceiver {
                     is RawWaveEvent -> {
                         listenerList.filterIsInstance<RawWaveListener>().forEach { it.onRawWaveEvent(event) }
                     }
-                    is EEGPowerEvent -> {
-                        listenerList.filterIsInstance<EEGPowerListener>().forEach { it.onEEGPowerEvent(event) }
+                    is SpectralEvent -> {
+                        listenerList.filterIsInstance<SpectralListener>().forEach { it.onSpectralEvent(event) }
                     }
                 }
             }

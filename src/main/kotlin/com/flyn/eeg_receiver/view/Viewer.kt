@@ -2,8 +2,10 @@ package com.flyn.eeg_receiver.view
 
 import com.fazecast.jSerialComm.SerialPort
 import com.flyn.eeg_receiver.data.DataReceiver
+import com.flyn.eeg_receiver.event.SpectralEvent
 import com.flyn.eeg_receiver.event.RawWaveEvent
 import com.flyn.eeg_receiver.getLoader
+import com.flyn.eeg_receiver.listener.SpectralListener
 import com.flyn.eeg_receiver.listener.RawWaveListener
 import javafx.application.Platform
 import javafx.collections.FXCollections
@@ -17,8 +19,9 @@ import javafx.scene.control.ChoiceBox
 import javafx.scene.control.Tooltip
 import javafx.stage.FileChooser
 import javafx.util.StringConverter
+import java.util.concurrent.ConcurrentLinkedQueue
 
-class Viewer: RawWaveListener {
+class Viewer: RawWaveListener, SpectralListener {
 
     companion object {
 
@@ -30,7 +33,9 @@ class Viewer: RawWaveListener {
     private var isPause = false
     private var comPort = ""
     private val rawData = XYChart.Series<Long, Int>()
-    private val tempData = mutableListOf<XYChart.Data<Long, Int>>()
+    private val tempData = ConcurrentLinkedQueue<XYChart.Data<Long, Int>>()
+    private val spectralEventList = ConcurrentLinkedQueue<SpectralEvent>()
+    private val tempSpectralList = ConcurrentLinkedQueue<SpectralEvent>()
 
     @FXML
     private lateinit var rawDataChart: LineChart<Long, Int>
@@ -61,7 +66,7 @@ class Viewer: RawWaveListener {
             }
 
         }
-        comPortSelect.tooltip = Tooltip("Select the COM Port")
+        comPortSelect.tooltip = Tooltip("Select the COM port")
         comPortSelect.items = FXCollections.observableArrayList<String>().apply {
             addAll(SerialPort.getCommPorts().map { port -> port.systemPortName })
         }
@@ -72,7 +77,9 @@ class Viewer: RawWaveListener {
 
     fun connectDevice() {
         if (DataReceiver.isConnect) {
+            isPause = false
             connectButton.text = "Connect"
+            controlButton.text = "Pause"
             DataReceiver.disconnect()
         }
         else {
@@ -87,14 +94,18 @@ class Viewer: RawWaveListener {
     fun chartControl() {
         if (!DataReceiver.isConnect) return
         if (isPause) {
-            controlButton.text = "pause"
+            controlButton.text = "Pause"
             rawData.data.clear()
             rawData.data.addAll(tempData)
+            spectralEventList.clear()
+            spectralEventList.addAll(tempSpectralList)
         }
         else {
-            controlButton.text = "resume"
+            controlButton.text = "Resume"
             tempData.clear()
             tempData.addAll(rawData.data)
+            tempSpectralList.clear()
+            tempSpectralList.addAll(spectralEventList)
         }
         isPause = !isPause
     }
@@ -106,8 +117,19 @@ class Viewer: RawWaveListener {
         val file = fileChooser.showSaveDialog(scene.window)
         file?.run {
             writeText("")
+            var isFirst = true
             rawData.data.forEach {
-                appendText("${it.xValue - DataReceiver.startTime}, ${it.yValue}\n")
+                if (isFirst) {
+                    isFirst = false
+                    appendText("${it.xValue - DataReceiver.startTime}, ${it.yValue}")
+                    return@forEach
+                }
+                appendText("\n${it.xValue - DataReceiver.startTime}, ${it.yValue}")
+            }
+            spectralEventList.forEach {
+                with(it) {
+                    appendText("\n${time - DataReceiver.startTime}, $delta, $theta, $lowAlpha, $highAlpha, $lowBeta, $highBeta, $lowGamma, $midGamma")
+                }
             }
         }
     }
@@ -115,21 +137,29 @@ class Viewer: RawWaveListener {
     override fun onRawWaveEvent(event: RawWaveEvent) {
         if (isPause) {
             with(tempData) {
-                if(size > 2560) removeAt(0)
-                add(XYChart.Data(event.time, event.value))
+                offer(XYChart.Data(event.time, event.value))
+                if (size > 2560) poll()
             }
+            return
         }
-        else {
-            Platform.runLater {
-                with(rawData.data) {
-                    if(size > 2560) removeAt(0)
-                    add(XYChart.Data(event.time, event.value))
-                    xAxis.lowerBound = this[0].xValue.toDouble()
-                    xAxis.upperBound = this[size - 1].xValue.toDouble()
-                }
+        Platform.runLater {
+            with(rawData.data) {
+                add(XYChart.Data(event.time, event.value))
+                if (size > 2560) removeAt(0)
+                xAxis.lowerBound = this[0].xValue.toDouble()
+                xAxis.upperBound = this[size - 1].xValue.toDouble()
             }
         }
     }
 
+    override fun onSpectralEvent(event: SpectralEvent) {
+        if (isPause) {
+            tempSpectralList.offer(event)
+            if (tempSpectralList.size > 5) tempSpectralList.poll()
+            return
+        }
+        spectralEventList.offer(event)
+        if (spectralEventList.size > 5) spectralEventList.poll()
+    }
 
 }

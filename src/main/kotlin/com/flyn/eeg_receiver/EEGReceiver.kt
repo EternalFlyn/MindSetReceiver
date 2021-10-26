@@ -1,10 +1,8 @@
 package com.flyn.eeg_receiver
 
-import com.fazecast.jSerialComm.SerialPort
 import com.flyn.eeg_receiver.data.DataReceiver
 import com.flyn.eeg_receiver.view.Viewer
 import javafx.application.Application
-import javafx.application.Platform
 import javafx.fxml.FXMLLoader
 import javafx.stage.Stage
 

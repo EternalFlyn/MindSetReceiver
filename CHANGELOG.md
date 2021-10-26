@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.2] - 2021-10-26
+### Changed
+- EEG Power event / listener renamed Spectral event / listener
+- csv file add device sent spectral data
+### Fixed
+- csv file's raw data amount fix to 2560
+
 ## [0.3.1] - 2021-10-18
 ### Added
 - Save EEG raw data to csv file

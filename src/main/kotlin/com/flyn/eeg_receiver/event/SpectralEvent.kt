@@ -1,6 +1,6 @@
 package com.flyn.eeg_receiver.event
 
-class EEGPowerEvent(val time: Long,
+class SpectralEvent(val time: Long,
                     val delta: Int,
                     val theta: Int,
                     val lowAlpha: Int,
