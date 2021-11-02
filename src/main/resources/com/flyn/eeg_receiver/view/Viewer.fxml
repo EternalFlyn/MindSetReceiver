@@ -8,7 +8,7 @@
    <center>
        <LineChart fx:id="rawDataChart" animated="false" createSymbols="false" layoutY="25.0" legendVisible="false" prefHeight="377.0" prefWidth="500.0" title="Raw Data">
            <xAxis>
-               <NumberAxis autoRanging="false" forceZeroInRange="false" label="time" minorTickVisible="false" side="BOTTOM" tickUnit="1000.0" fx:id="xAxis" />
+               <NumberAxis autoRanging="false" forceZeroInRange="false" label="time" minorTickVisible="false" side="BOTTOM" tickUnit="1.0E9" upperBound="0.0" fx:id="xAxis" />
            </xAxis>
            <yAxis>
                <NumberAxis autoRanging="false" label="voltage" lowerBound="-2048.0" minorTickCount="0" minorTickLength="1.0" side="LEFT" tickUnit="512.0" upperBound="2047.0" />
@@ -17,10 +17,10 @@
    </center>
    <bottom>
        <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-           <Button fx:id="connectButton" mnemonicParsing="false" onAction="#connectDevice" text="Connect"/>
-           <ChoiceBox fx:id="comPortSelect" prefWidth="150.0"/>
-           <Button fx:id="controlButton" mnemonicParsing="false" onAction="#chartControl" text="Pause"/>
-           <Button mnemonicParsing="false" onAction="#saveFile" text="Save"/>
+           <Button fx:id="connectButton" mnemonicParsing="false" onAction="#connectDevice" text="Connect" />
+           <ChoiceBox fx:id="comPortSelect" prefWidth="150.0" />
+           <Button fx:id="controlButton" disable="true" mnemonicParsing="false" onAction="#chartControl" text="Pause" />
+           <Button fx:id="saveButton" disable="true" mnemonicParsing="false" onAction="#saveFile" text="Save" />
        </ToolBar>
    </bottom>
 </BorderPane>

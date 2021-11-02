@@ -18,16 +18,16 @@ object DataReceiver {
     private const val MEDITATION = 0X05
     private const val STRENGTH = 0X16
     private const val RAW_WAVE = 0X80
-    private const val SPECTRAL = 0X83
+    private const val BAND = 0X83
 
     private val dataStorage = ConcurrentLinkedQueue<Byte>()
     private val eventList = ConcurrentLinkedQueue<DeviceEvent>()
     private val listenerList = CopyOnWriteArrayList<DeviceListener>()
     private lateinit var serialPort: SerialPort
 
+    private var startTime: Long = -1
+
     var isConnect = false
-        private set
-    var startTime: Long = -1
         private set
 
     fun connect(comPort: String, echo: Boolean = false) {
@@ -56,7 +56,7 @@ object DataReceiver {
 
         })
         println("Device connect")
-        startTime = System.currentTimeMillis()
+        startTime = System.nanoTime()
         Thread { dataDecoder() }.start()
         Thread { eventExecutor() }.start()
     }
@@ -76,9 +76,8 @@ object DataReceiver {
     private fun dataDecoder() {
         while (isConnect) {
             if (dataStorage.size > 0) {
-                val time = System.currentTimeMillis()
                 Decoder.dataDecode().forEach {
-                    payloadDecoder(time, it.code, it.value)
+                    payloadDecoder(System.nanoTime() - startTime, it.code, it.value)
                 }
             }
             else {
@@ -97,7 +96,7 @@ object DataReceiver {
                 val value = ByteBuffer.wrap(values.slice(0..1).toByteArray()).order(ByteOrder.BIG_ENDIAN)
                 eventList.add(RawWaveEvent(time, value.short.toInt()))
             }
-            SPECTRAL -> {
+            BAND -> {
                 val wave = values.withIndex().groupBy {
                     it.index / 3
                 }.map {
@@ -107,7 +106,7 @@ object DataReceiver {
                     }
                     value
                 }
-                eventList.add(SpectralEvent(time, wave[0], wave[1], wave[2], wave[3], wave[4], wave[5], wave[6], wave[7]))
+                eventList.add(BandEvent(time, wave[0], wave[1], wave[2], wave[3], wave[4], wave[5], wave[6], wave[7]))
             }
             else -> {
                 print("unknown code event: %02x with value:".format(code))
@@ -136,8 +135,8 @@ object DataReceiver {
                     is RawWaveEvent -> {
                         listenerList.filterIsInstance<RawWaveListener>().forEach { it.onRawWaveEvent(event) }
                     }
-                    is SpectralEvent -> {
-                        listenerList.filterIsInstance<SpectralListener>().forEach { it.onSpectralEvent(event) }
+                    is BandEvent -> {
+                        listenerList.filterIsInstance<BandListener>().forEach { it.onSpectralEvent(event) }
                     }
                 }
             }

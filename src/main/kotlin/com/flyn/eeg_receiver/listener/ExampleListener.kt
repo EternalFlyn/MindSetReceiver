@@ -3,7 +3,7 @@ package com.flyn.eeg_receiver.listener
 import com.flyn.eeg_receiver.event.*
 
 object ExampleListener: PoorSignalListener, AttentionListener, MeditationListener, StrengthListener, RawWaveListener,
-    SpectralListener {
+    BandListener {
 
     override fun onRawWaveEvent(event: RawWaveEvent) {
         println("Receive Raw Wave Event, value: ${event.value}")
@@ -17,7 +17,7 @@ object ExampleListener: PoorSignalListener, AttentionListener, MeditationListene
         println("Receive Attention Event, value: ${event.value}")
     }
 
-    override fun onSpectralEvent(event: SpectralEvent) {
+    override fun onSpectralEvent(event: BandEvent) {
         print("Receive EEG Event,")
         print("low-alpha: ${event.lowAlpha},")
         print("high-alpha: ${event.highAlpha},")

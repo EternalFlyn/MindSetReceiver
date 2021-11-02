@@ -8,8 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.3.2] - 2021-10-26
 ### Changed
-- EEG Power event / listener renamed Spectral event / listener
-- csv file add device sent spectral data
+- EEG Power event / listener renamed Band event / listener
+- csv file add device sent band data
+- time unit change to nanoSecond
 ### Fixed
 - csv file's raw data amount fix to 2560
 
