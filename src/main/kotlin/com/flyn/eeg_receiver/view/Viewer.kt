@@ -9,6 +9,7 @@ import com.flyn.eeg_receiver.listener.BandListener
 import com.flyn.eeg_receiver.listener.RawWaveListener
 import javafx.application.Platform
 import javafx.collections.FXCollections
+import javafx.concurrent.Task
 import javafx.fxml.FXML
 import javafx.scene.Scene
 import javafx.scene.chart.LineChart
@@ -19,6 +20,7 @@ import javafx.scene.control.ChoiceBox
 import javafx.scene.control.Tooltip
 import javafx.stage.FileChooser
 import javafx.util.StringConverter
+import java.io.File
 import java.util.concurrent.ConcurrentLinkedQueue
 
 class Viewer: RawWaveListener, BandListener {
@@ -85,13 +87,32 @@ class Viewer: RawWaveListener, BandListener {
             DataReceiver.disconnect()
         }
         else {
-            connectButton.text = "Disconnect"
-            controlButton.isDisable = false
-            saveButton.isDisable = false
-            DataReceiver.connect(comPort)
-            rawData.data.clear()
-            xAxis.lowerBound = 0.0
-            xAxis.upperBound = 0.0
+            val task = object: Task<Boolean>() {
+
+                override fun call(): Boolean {
+                    return DataReceiver.connect(comPort)
+                }
+
+                override fun running() {
+                    connectButton.isDisable = true
+                    connectButton.text = "Connecting..."
+                }
+
+                override fun succeeded() {
+                    connectButton.isDisable = false
+                    if (value) {
+                        connectButton.text = "Disconnect"
+                        controlButton.isDisable = false
+                        saveButton.isDisable = false
+                        rawData.data.clear()
+                        xAxis.lowerBound = 0.0
+                        xAxis.upperBound = 0.0
+                    }
+                    else connectButton.text = "Connect"
+                }
+
+            }
+            Thread { task.run() }.start()
         }
     }
 
@@ -115,22 +136,22 @@ class Viewer: RawWaveListener, BandListener {
         if (!isPause) chartControl()
         val fileChooser = FileChooser().apply {
             extensionFilters.add(FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv"))
+            initialDirectory = File(".")
         }
         val file = fileChooser.showSaveDialog(scene.window)
-        file?.run {
-            writeText("")
+        file.printWriter().use { out ->
             var isFirst = true
             rawData.data.forEach {
                 if (isFirst) {
                     isFirst = false
-                    appendText("${it.xValue}, ${it.yValue}")
+                    out.print("${it.xValue}, ${it.yValue}")
                     return@forEach
                 }
-                appendText("\n${it.xValue}, ${it.yValue}")
+                out.print("\n${it.xValue}, ${it.yValue}")
             }
             tempBandList.forEach {
                 with(it) {
-                    appendText("\n$time, $delta, $theta, $lowAlpha, $highAlpha, $lowBeta, $highBeta, $lowGamma, $midGamma")
+                    out.print("\n$time, $delta, $theta, $lowAlpha, $highAlpha, $lowBeta, $highBeta, $lowGamma, $midGamma")
                 }
             }
         }

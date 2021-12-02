@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.3] - 2021-12-2
+### Added
+- Connect button add determine if there is connection function
+### Changed
+- Decoder change to Java8 grammar
+- MetaEvent separates from decoder
+- set saving file initial directory to execute path
+### Fixed
+- Optimize saving file method
+
 ## [0.3.2] - 2021-10-26
 ### Changed
 - EEG Power event / listener renamed Band event / listener

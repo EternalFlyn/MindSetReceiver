@@ -8,8 +8,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 class Decoder {
 
-    record MetaEvent(int code, List<Byte> value) {}
-
     static boolean isDecoding = false;
     static ConcurrentLinkedQueue<Byte> dataStorage;
 
@@ -36,24 +34,24 @@ class Decoder {
         ArrayList<Byte> value = new ArrayList<>();
         for(Byte it : payload) {
             switch (state) {
-                case GET_CODE -> {
+                case GET_CODE:
                     code = it & 0xFF;
                     value = new ArrayList<>();
                     if ((code & 0x80) > 0) state = DecoderState.GET_LENGTH;
                     else state = DecoderState.GET_VALUE;
-                }
-                case GET_LENGTH -> {
+                    break;
+                case GET_LENGTH:
                     dataLength = it & 0xFF;
                     state = DecoderState.GET_VALUE;
-                }
-                case GET_VALUE -> {
+                    break;
+                case GET_VALUE:
                     dataLength--;
                     value.add(it);
                     if(dataLength <= 0) {
                         state = DecoderState.GET_CODE;
                         result.add(new MetaEvent(code, value));
                     }
-                }
+                    break;
             }
         }
         isDecoding = false;

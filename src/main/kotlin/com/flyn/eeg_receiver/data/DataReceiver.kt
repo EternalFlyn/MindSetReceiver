@@ -30,12 +30,16 @@ object DataReceiver {
     var isConnect = false
         private set
 
-    fun connect(comPort: String, echo: Boolean = false) {
-        if (isConnect) return
-        isConnect = true
-        Decoder.dataStorage = dataStorage
+    fun connect(comPort: String, echo: Boolean = false): Boolean {
+        if (isConnect) return false
         serialPort = SerialPort.getCommPort(comPort)
         serialPort.openPort()
+        if (!serialPort.isOpen) {
+            println("Device can not connect")
+            return false
+        }
+        isConnect = true
+        Decoder.dataStorage = dataStorage
         serialPort.addDataListener(object : SerialPortDataListener {
 
             override fun getListeningEvents(): Int {
@@ -59,6 +63,7 @@ object DataReceiver {
         startTime = System.nanoTime()
         Thread { dataDecoder() }.start()
         Thread { eventExecutor() }.start()
+        return true
     }
 
     fun disconnect() {

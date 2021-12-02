@@ -6,7 +6,12 @@ plugins {
 }
 
 group 'com.flyn'
-version '0.3.0'
+version '0.3.3'
+
+compileJava {
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+}
 
 repositories {
     mavenCentral()
@@ -27,4 +32,14 @@ test {
 javafx {
     version = "16"
     modules = [ 'javafx.controls', 'javafx.fxml' ]
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'com/flyn/eeg_receiver/EEGReceiverKt'
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
